@@ -1,0 +1,18 @@
+
+INSERT INTO clothing (name, size, color, purchase_price, selling_price) VALUES ('T-Shirt', 'M', 'Blue', 10.0, 20.0);
+INSERT INTO clothing (name, size, color, purchase_price, selling_price) VALUES ('Jeans', 'L', 'Black', 15.0, 30.0);
+INSERT INTO clothing (name, size, color, purchase_price, selling_price) VALUES ('Jacket', 'XL', 'Red', 25.0, 50.0);
+
+INSERT INTO store (name, location) VALUES ('Downtown Store', '123 Main Street');
+INSERT INTO store (name, location) VALUES ('Mall Store', '456 Mall Road');
+INSERT INTO store (name, location) VALUES ('Outlet Store', '789 Outlet Ave');
+
+INSERT INTO transaction (clothing_id, store_id, amount, transaction_date, type) VALUES (1, 1, 20.0, '2024-12-01 10:30:00', 'SALE');
+INSERT INTO transaction (clothing_id, store_id, amount, transaction_date, type) VALUES (2, 2, 30.0, '2024-12-01 11:00:00', 'PURCHASE');
+INSERT INTO transaction (clothing_id, store_id, amount, transaction_date, type) VALUES (3, 1, 50.0, '2024-12-01 12:00:00', 'SALE');
+INSERT INTO transaction (clothing_id, store_id, amount, transaction_date, type) VALUES (1, 3, 20.0, '2024-12-01 13:30:00', 'PURCHASE');
+
+INSERT INTO inventory (id, total_items, last_updated) VALUES (1, 50, '2024-12-01 10:30:00');
+INSERT INTO inventory (id, total_items, last_updated) VALUES (2, 75, '2024-12-01 11:00:00');
+INSERT INTO inventory (id, total_items, last_updated) VALUES (3, 100, '2024-12-01 12:00:00');
+
