@@ -32,6 +32,9 @@ public class Clothing {
     @Column(name = "selling_price")
     private double sellingPrice;
 
+    @Column(name = "stock")
+    private int stock = 1; // Inicializa el stock en 1
+
     @ManyToOne (optional = true)
     @JoinColumn(name="inventory_id")
     @JsonIgnore

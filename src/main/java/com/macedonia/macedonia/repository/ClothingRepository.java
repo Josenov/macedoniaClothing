@@ -8,5 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClothingRepository extends JpaRepository<Clothing, Long> {
 
+    Clothing findByNameAndInventoryId(String name, Long inventoryId);
+
 
 }

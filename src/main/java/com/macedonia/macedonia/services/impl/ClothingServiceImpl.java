@@ -5,6 +5,7 @@ import com.macedonia.macedonia.entities.Transaction;
 import com.macedonia.macedonia.persistence.ClothingDAO;
 import com.macedonia.macedonia.persistence.TransactionDAO;
 import com.macedonia.macedonia.services.ClothingService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -57,7 +58,7 @@ public class ClothingServiceImpl implements ClothingService {
     public void deleteClothing(Long id) {
         // Buscar el Clothing por ID
         Clothing clothing = clothingDAO.findById(id).orElseThrow(() ->
-                new RuntimeException("Clothing with ID " + id + " not found")
+                new EntityNotFoundException("Prenda con ID " + id + " no se encuentra en la base de datos o ya fue eliminada")
         );
 
         // Desvincular transacciones relacionadas
