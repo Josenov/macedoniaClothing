@@ -15,11 +15,12 @@ public class InventoryDAOImpl extends GenericDAOImpl<Inventory, Long, InventoryR
 
     @Override
     protected Class<Inventory> getEntityClass() {
-        return null;
-    }
+
+        return Inventory.class;
+    };
 
     @Override
     protected String getEntityName() {
-        return null;
+        return "Inventory";
     }
 }

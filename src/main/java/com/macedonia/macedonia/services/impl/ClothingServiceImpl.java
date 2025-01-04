@@ -1,8 +1,10 @@
 package com.macedonia.macedonia.services.impl;
 
 import com.macedonia.macedonia.entities.Clothing;
+import com.macedonia.macedonia.entities.Inventory;
 import com.macedonia.macedonia.entities.Transaction;
 import com.macedonia.macedonia.persistence.ClothingDAO;
+import com.macedonia.macedonia.persistence.InventoryDAO;
 import com.macedonia.macedonia.persistence.TransactionDAO;
 import com.macedonia.macedonia.services.ClothingService;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,15 +22,48 @@ public class ClothingServiceImpl implements ClothingService {
 
     private final TransactionDAO transactionDAO;
 
+    private final InventoryDAO inventoryDAO;
 
-    public ClothingServiceImpl(ClothingDAO clothingDAO, TransactionDAO transactionDAO){
+
+    public ClothingServiceImpl(ClothingDAO clothingDAO, TransactionDAO transactionDAO, InventoryDAO inventoryDAO){
 
         this.clothingDAO=clothingDAO;
         this.transactionDAO=transactionDAO;
+        this.inventoryDAO=inventoryDAO;
     };
 
     @Override
     public Clothing createClothing(Clothing clothing) {
+
+
+        // Verificar si se ha proporcionado un ID de inventario
+        if (clothing.getInventory() == null || clothing.getInventory().getId() == null) {
+            System.out.println("El objeto Inventory es null.");
+            throw new IllegalArgumentException("Debe especificar un ID de inventario válido.");
+        }
+
+        // Log para verificar el ID del inventario
+        System.out.println("ID del inventario recibido: " + clothing.getInventory().getId());
+
+        // Buscar el inventario por ID
+        Inventory inventory = inventoryDAO.findById(clothing.getInventory().getId())
+                .orElseThrow(() -> new IllegalArgumentException("El inventario especificado no existe."));
+
+        // Buscar si la prenda ya existe en el inventario
+        Clothing existingClothing = clothingDAO.findByNameAndInventoryId(
+                clothing.getName(),
+                inventory.getId()
+        );
+
+        if (existingClothing != null) {
+            // Incrementar el stock si ya existe
+            existingClothing.setStock(existingClothing.getStock() + 1);
+            return clothingDAO.save(existingClothing);
+        }
+
+        // Si no existe, asociar la prenda al inventario, establecer el stock inicial y guardarla
+        clothing.setInventory(inventory);
+        clothing.setStock(1);
         return clothingDAO.save(clothing);
     }
 

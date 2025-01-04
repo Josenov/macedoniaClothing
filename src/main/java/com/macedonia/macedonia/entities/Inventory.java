@@ -20,6 +20,12 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "location")
+    private String location;
+
     /*@OneToMany
     @JoinColumn(name="inventory_id") // clothing relation
     @JsonManagedReference
@@ -32,6 +38,7 @@ public class Inventory {
     private LocalDateTime lastUpdated;
 
     @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Clothing> clothingItems = new ArrayList<>();
 
 

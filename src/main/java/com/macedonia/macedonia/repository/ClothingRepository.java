@@ -11,4 +11,6 @@ public interface ClothingRepository extends JpaRepository<Clothing, Long> {
     Clothing findByNameAndInventoryId(String name, Long inventoryId);
 
 
+
+
 }

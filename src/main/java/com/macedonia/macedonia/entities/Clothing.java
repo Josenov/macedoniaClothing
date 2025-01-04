@@ -1,5 +1,6 @@
 package com.macedonia.macedonia.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -33,10 +34,10 @@ public class Clothing {
     private double sellingPrice;
 
     @Column(name = "stock")
-    private int stock = 1; // Inicializa el stock en 1
+    private Integer stock = 1; // Inicializa el stock en 1
 
-    @ManyToOne (optional = true)
-    @JoinColumn(name="inventory_id")
-    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name="inventory_id", nullable = true)
+    @JsonBackReference
     private Inventory inventory;
 }

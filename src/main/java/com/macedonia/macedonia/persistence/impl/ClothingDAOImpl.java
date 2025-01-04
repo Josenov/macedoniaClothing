@@ -14,11 +14,17 @@ public class ClothingDAOImpl extends GenericDAOImpl<Clothing,Long, ClothingRepos
 
     @Override
     protected Class<Clothing> getEntityClass() {
-        return null;
+        return Clothing.class; // Devuelve la clase de la entidad
     }
 
     @Override
     protected String getEntityName() {
-        return null;
+        return "Clothing"; // Devuelve el nombre de la entidad
+    }
+
+    @Override
+    public Clothing findByNameAndInventoryId(String name, Long inventoryId) {
+        // Delegar al repositorio para buscar la prenda
+        return repository.findByNameAndInventoryId(name, inventoryId);
     }
 }
