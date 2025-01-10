@@ -40,4 +40,21 @@ public class Clothing {
     @JoinColumn(name="inventory_id", nullable = true)
     @JsonBackReference
     private Inventory inventory;
+
+
+
+    // Método getter sincronizado
+    public Long getInventoryId() {
+        return inventory != null ? inventory.getId() : null;
+    }
+
+
+    /*@Transient
+    private Long myInventoryId;
+    // Método setter sincronizado
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+        this.myInventoryId= (inventory != null) ? inventory.getId() : null;
+    }*/
+
 }

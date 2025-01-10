@@ -1,5 +1,6 @@
 package com.macedonia.macedonia.services.impl;
 
+import com.macedonia.macedonia.dto.ClothingDTO;
 import com.macedonia.macedonia.entities.Clothing;
 import com.macedonia.macedonia.entities.Inventory;
 import com.macedonia.macedonia.entities.Transaction;
@@ -32,7 +33,7 @@ public class ClothingServiceImpl implements ClothingService {
         this.inventoryDAO=inventoryDAO;
     };
 
-    @Override
+    /*@Override
     public Clothing createClothing(Clothing clothing) {
 
 
@@ -65,22 +66,73 @@ public class ClothingServiceImpl implements ClothingService {
         clothing.setInventory(inventory);
         clothing.setStock(1);
         return clothingDAO.save(clothing);
+    }*/
+
+
+    //Mapeo ClothingDTO
+
+    private ClothingDTO mapToDTO(Clothing clothing){
+        return new ClothingDTO(
+                clothing.getId(),
+                clothing.getName(),
+                clothing.getSize(),
+                clothing.getColor(),
+                clothing.getPurchasePrice(),
+                clothing.getSellingPrice(),
+                clothing.getStock(),
+                clothing.getInventoryId() != null ? clothing.getInventoryId() : null
+        );
+
+
+    }
+
+    private Clothing mapToEntity(ClothingDTO clothingDTO){
+
+        Clothing clothing = new Clothing();
+        clothing.setId(clothingDTO.getId());
+        clothing.setName(clothingDTO.getName());
+        clothing.setSize(clothingDTO.getSize());
+        clothing.setColor(clothingDTO.getColor());
+        clothing.setPurchasePrice(clothingDTO.getPurchasePrice());
+        clothing.setSellingPrice(clothingDTO.getSellingPrice());
+        clothing.setStock(clothingDTO.getStock());
+
+        return clothing;
+
+    }
+
+    @Override
+    public ClothingDTO createClothing(ClothingDTO clothingDTO) {
+        if (clothingDTO.getInventoryId() == null) {
+            System.out.println("Inventory ID is null!");
+            throw new IllegalArgumentException("Debe especificar un ID de inventario válido.");
+        }
+
+        // Buscar el inventario por ID
+        Inventory inventory = inventoryDAO.findById(clothingDTO.getInventoryId())
+                .orElseThrow(() -> new IllegalArgumentException("El inventario especificado no existe."));
+
+        // Convertir DTO a entidad
+        Clothing clothing = mapToEntity(clothingDTO);
+
+        // Buscar si la prenda ya existe en el inventario
+        Clothing existingClothing = clothingDAO.findByNameAndInventory(clothingDTO.getName(), inventory);
+
+        if (existingClothing != null) {
+            // Incrementar el stock si ya existe
+            existingClothing.setStock(existingClothing.getStock() + 1);
+            return mapToDTO(clothingDAO.save(existingClothing));
+        }
+
+        // Si no existe, asociar la prenda al inventario, establecer el stock inicial y guardarla
+        clothing.setInventory(inventory);
+        clothing.setStock(1);
+        return mapToDTO(clothingDAO.save(clothing));
     }
 
     @Override
     public Clothing updateClothing(Long id, Clothing clothing) {
-        Optional<Clothing> existingClothing = clothingDAO.findById(id);
-        if (existingClothing.isPresent()) {
-            Clothing updated = existingClothing.get();
-            updated.setName(clothing.getName());
-            updated.setSize(clothing.getSize());
-            updated.setColor(clothing.getColor());
-            updated.setPurchasePrice(clothing.getPurchasePrice());
-            updated.setSellingPrice(clothing.getSellingPrice());
-            return clothingDAO.save(updated);
-        } else {
-            throw new RuntimeException("Clothing not found with ID: " + id);
-        }
+        return null;
     }
 
     /*@Override

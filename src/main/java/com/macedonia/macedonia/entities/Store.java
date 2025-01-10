@@ -25,9 +25,8 @@ public class Store {
     @Column(name="location")
     private String location;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name="inventory_id", referencedColumnName = "id")
-    
     private Inventory inventory;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)

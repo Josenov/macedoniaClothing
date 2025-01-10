@@ -1,5 +1,6 @@
 package com.macedonia.macedonia.controllers;
 
+import com.macedonia.macedonia.dto.ClothingDTO;
 import com.macedonia.macedonia.entities.Clothing;
 import com.macedonia.macedonia.services.ClothingService;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,8 +24,8 @@ public class ClothingController {
 
     //Create Clothing Item
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createClothing(@RequestBody Clothing clothing) {
-        Clothing createdClothing = clothingService.createClothing(clothing);
+    public ResponseEntity<Map<String, Object>> createClothing(@RequestBody ClothingDTO clothingDTO) {
+        ClothingDTO createdClothing = clothingService.createClothing(clothingDTO);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Prenda creada con éxito");
         response.put("data", createdClothing);

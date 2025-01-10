@@ -59,6 +59,25 @@ public class Inventory {
 
     }
 
+    @PostLoad
+    private void synchronizeTotalItems() {
+        if (this.clothingItems != null) {
+            this.totalItems = this.clothingItems.stream()
+                    .mapToInt(Clothing::getStock)
+                    .sum();
+        } else {
+            this.totalItems = 0;
+        }
+
+        // Inicializar lastUpdated si es null
+        if (this.lastUpdated == null) {
+            this.lastUpdated = LocalDateTime.now();
+        }
+    }
+
+
+
+
     // Update last updated timestamp
     public void updateLastUpdated() {
         this.lastUpdated = LocalDateTime.now();
