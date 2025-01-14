@@ -1,5 +1,6 @@
 package com.macedonia.macedonia.services;
 
+import com.macedonia.macedonia.dto.TransactionDTO;
 import com.macedonia.macedonia.entities.Transaction;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.Optional;
 
 public interface TransactionService {
 
-    Transaction createTransaction(Transaction transaction);
+    TransactionDTO createTransaction(TransactionDTO transactionDTO);
 
     Transaction updatedTransaction (Long id, Transaction transaction);
     void deleteTransaction(Long id);

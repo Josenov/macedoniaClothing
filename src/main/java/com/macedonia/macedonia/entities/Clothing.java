@@ -34,7 +34,7 @@ public class Clothing {
     private double sellingPrice;
 
     @Column(name = "stock")
-    private Integer stock = 1; // Inicializa el stock en 1
+    private Integer stock = 1;
 
     @ManyToOne
     @JoinColumn(name="inventory_id", nullable = true)

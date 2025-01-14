@@ -1,5 +1,6 @@
 package com.macedonia.macedonia.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,8 @@ public class Transaction {
     @Column(name="amount", nullable = false)
     private double amount;
 
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name="transaction_date", nullable = false)
     private LocalDateTime transactionDate;
 

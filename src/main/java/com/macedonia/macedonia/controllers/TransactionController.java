@@ -1,5 +1,6 @@
 package com.macedonia.macedonia.controllers;
 
+import com.macedonia.macedonia.dto.TransactionDTO;
 import com.macedonia.macedonia.entities.Transaction;
 import com.macedonia.macedonia.services.TransactionService;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +20,17 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
-        Transaction createdTransaction = transactionService.createTransaction(transaction);
-        return ResponseEntity.ok(createdTransaction);
+    public ResponseEntity<?> createTransaction(@RequestBody TransactionDTO transactionDTO) {
+        try {
+            // Convertir DTO a entidad y crear la transacción
+            TransactionDTO createdTransaction = transactionService.createTransaction(transactionDTO);
+
+            return ResponseEntity.status(201).body(createdTransaction);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Error al crear transacción: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Ocurrió un error inesperado: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -38,8 +47,23 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
+    public ResponseEntity<List<Transaction>> getAllTransactions(
+            @RequestParam(required = false) Long storeId,
+            @RequestParam(required = false) String type) {
         List<Transaction> transactions = transactionService.getAllTransactions();
+
+        // Filtros opcionales
+        if (storeId != null) {
+            transactions = transactions.stream()
+                    .filter(t -> t.getStore().getId().equals(storeId))
+                    .toList();
+        }
+        if (type != null) {
+            transactions = transactions.stream()
+                    .filter(t -> t.getType().equalsIgnoreCase(type))
+                    .toList();
+        }
+
         return ResponseEntity.ok(transactions);
     }
 
