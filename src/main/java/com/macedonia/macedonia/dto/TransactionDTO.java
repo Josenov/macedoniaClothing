@@ -16,6 +16,8 @@ public class TransactionDTO {
 
     private String clothingName;
 
+    private int quantity;
+
 
     private String storeName;
 

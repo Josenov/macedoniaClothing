@@ -33,6 +33,9 @@ public class Transaction {
     @Column(name="amount", nullable = false)
     private double amount;
 
+    @Column(name="quantity", nullable = false)
+    private int quantity;
+
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name="transaction_date", nullable = false)

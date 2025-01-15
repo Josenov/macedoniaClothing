@@ -35,6 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .type(transaction.getType())
                 .amount(transaction.getAmount())
                 .transactionDate(transaction.getTransactionDate())
+                .quantity(transaction.getQuantity())
                 .notes(transaction.getNotes());
 
         if (transaction.getClothing() != null) {
@@ -115,37 +116,44 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> new IllegalArgumentException("La tienda especificada no existe."));
         transaction.setStore(store);
 
-        // Validar prenda si está presente
-        if (transactionDTO.getClothingId() != null) {
-            Clothing clothing = clothingDAO.findById(transactionDTO.getClothingId())
-                    .orElseThrow(() -> new IllegalArgumentException("La prenda especificada no existe."));
+        // Validar cantidad
+        int quantity = transactionDTO.getQuantity();
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor a 0.");
+        }
+        transaction.setQuantity(quantity);
 
-            transaction.setClothing(clothing);
+        // Validar prenda
+        if (transactionDTO.getClothingId() == null) {
+            throw new IllegalArgumentException("Debe especificar un ID de prenda válido.");
+        }
+        Clothing clothing = clothingDAO.findById(transactionDTO.getClothingId())
+                .orElseThrow(() -> new IllegalArgumentException("La prenda especificada no existe."));
+        transaction.setClothing(clothing);
 
-            // Manejar stock basado en el tipo de transacción
-            if ("COMPRA".equalsIgnoreCase(transaction.getType())) {
-                clothing.setStock(clothing.getStock() + 1); // Incrementar el stock
-                clothingDAO.save(clothing); // Actualizar el stock en la base de datos
-            } else if ("VENTA".equalsIgnoreCase(transaction.getType())) {
-                if (clothing.getStock() < 1) {
-                    throw new IllegalArgumentException("Stock insuficiente para la venta.");
-                }
-                clothing.setStock(clothing.getStock() - 1); // Reducir el stock
-                clothingDAO.save(clothing); // Actualizar el stock en la base de datos
-            } else {
-                throw new IllegalArgumentException("Tipo de transacción inválido. Debe ser COMPRA o VENTA.");
+        // Manejar stock y calcular monto
+        if ("COMPRA".equalsIgnoreCase(transaction.getType())) {
+            clothing.setStock(clothing.getStock() + quantity);
+            clothingDAO.save(clothing);
+            transaction.setAmount(quantity * clothing.getPurchasePrice());
+        } else if ("VENTA".equalsIgnoreCase(transaction.getType())) {
+            if (clothing.getStock() < quantity) {
+                throw new IllegalArgumentException("Stock insuficiente para la venta.");
             }
+            clothing.setStock(clothing.getStock() - quantity);
+            clothingDAO.save(clothing);
+            transaction.setAmount(quantity * clothing.getSellingPrice());
+        } else {
+            throw new IllegalArgumentException("Tipo de transacción inválido. Debe ser COMPRA o VENTA.");
         }
 
-        // Asignar la fecha actual si no se proporciona
+        // Asignar fecha de la transacción
         if (transaction.getTransactionDate() == null) {
             transaction.setTransactionDate(LocalDateTime.now());
         }
 
-        // Guardar la transacción
+        // Guardar la transacción y devolver DTO
         Transaction savedTransaction = transactionDAO.save(transaction);
-
-        // Mapear a DTO simplificado y devolverlo
         return mapToDTO(savedTransaction);
     }
 
