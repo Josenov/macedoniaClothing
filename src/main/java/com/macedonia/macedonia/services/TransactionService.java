@@ -10,9 +10,14 @@ public interface TransactionService {
 
     TransactionDTO createTransaction(TransactionDTO transactionDTO);
 
-    Transaction updatedTransaction (Long id, Transaction transaction);
+    TransactionDTO updatedTransaction (Long id, TransactionDTO transactionDTO);
+
+
     void deleteTransaction(Long id);
     Optional<Transaction> getTransactionById(Long id);
 
     List<Transaction> getAllTransactions();
+
+    double getTotalInvestmentByMonth(int year, int month);
+    double getTotalSalesByMonth(int year, int month);
 }

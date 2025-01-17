@@ -158,20 +158,68 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction updatedTransaction(Long id, Transaction transactionDetails) {
+    public TransactionDTO updatedTransaction(Long id, TransactionDTO transactionDTO) {
+        // Buscar la transacción existente
         Transaction existingTransaction = transactionDAO.findById(id).orElseThrow(() ->
-                new RuntimeException("Transaction not found with ID: " + id)
+                new IllegalArgumentException("Transaction not found with ID: " + id)
         );
 
-        // Actualizar los campos de la transacción
-        existingTransaction.setType(transactionDetails.getType());
-        existingTransaction.setAmount(transactionDetails.getAmount());
-        existingTransaction.setTransactionDate(transactionDetails.getTransactionDate());
-        existingTransaction.setNotes(transactionDetails.getNotes());
+        // Validar y actualizar los campos
+        if (transactionDTO.getType() != null) {
+            existingTransaction.setType(transactionDTO.getType());
+        }
+        if (transactionDTO.getTransactionDate() != null) {
+            existingTransaction.setTransactionDate(transactionDTO.getTransactionDate());
+        }
+        if (transactionDTO.getNotes() != null) {
+            existingTransaction.setNotes(transactionDTO.getNotes());
+        }
 
+        // Actualizar quantity si está presente
+        if (transactionDTO.getQuantity() != 0) {
+            int newQuantity = transactionDTO.getQuantity();
 
+            // Validar stock según el tipo de transacción
+            if ("COMPRA".equalsIgnoreCase(existingTransaction.getType())) {
+                existingTransaction.getClothing().setStock(
+                        existingTransaction.getClothing().getStock() + (newQuantity - existingTransaction.getQuantity())
+                );
+            } else if ("VENTA".equalsIgnoreCase(existingTransaction.getType())) {
+                int stockDifference = existingTransaction.getQuantity() - newQuantity;
+                if (stockDifference > existingTransaction.getClothing().getStock()) {
+                    throw new IllegalArgumentException("Stock insuficiente para la actualización de la venta.");
+                }
+                existingTransaction.getClothing().setStock(existingTransaction.getClothing().getStock() + stockDifference);
+            }
 
-        return transactionDAO.save(existingTransaction);
+            // Actualizar quantity en la transacción
+            existingTransaction.setQuantity(newQuantity);
+        }
+
+        if (transactionDTO.getClothingId() != null) {
+            Clothing clothing = clothingDAO.findById(transactionDTO.getClothingId())
+                    .orElseThrow(() -> new IllegalArgumentException("Clothing not found with ID: " + transactionDTO.getClothingId()));
+            existingTransaction.setClothing(clothing);
+        }
+
+        if (transactionDTO.getStoreId() != null) {
+            Store store = storeDAO.findById(transactionDTO.getStoreId())
+                    .orElseThrow(() -> new IllegalArgumentException("Store not found with ID: " + transactionDTO.getStoreId()));
+            existingTransaction.setStore(store);
+        }
+
+        // Recalcular el monto de la transacción
+        if ("COMPRA".equalsIgnoreCase(existingTransaction.getType())) {
+            existingTransaction.setAmount(existingTransaction.getQuantity() * existingTransaction.getClothing().getPurchasePrice());
+        } else if ("VENTA".equalsIgnoreCase(existingTransaction.getType())) {
+            existingTransaction.setAmount(existingTransaction.getQuantity() * existingTransaction.getClothing().getSellingPrice());
+        }
+
+        // Guardar los cambios en la base de datos
+        Transaction updatedTransaction = transactionDAO.save(existingTransaction);
+
+        // Convertir la transacción actualizada a DTO y devolverla
+        return mapToDTO(updatedTransaction);
     }
 
     @Override
@@ -187,5 +235,17 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<Transaction> getAllTransactions() {
         return transactionDAO.findAll();
+    }
+
+    @Override
+    public double getTotalInvestmentByMonth(int year, int month) {
+        List<Transaction> purchases = transactionDAO.findByTypeAndDate("COMPRA", year, month);
+        return purchases.stream().mapToDouble(Transaction::getAmount).sum();
+    }
+
+    @Override
+    public double getTotalSalesByMonth(int year, int month) {
+        List<Transaction> sales = transactionDAO.findByTypeAndDate("VENTA", year, month);
+        return sales.stream().mapToDouble(Transaction::getAmount).sum();
     }
 }

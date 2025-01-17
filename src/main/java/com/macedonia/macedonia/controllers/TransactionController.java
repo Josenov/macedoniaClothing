@@ -6,7 +6,9 @@ import com.macedonia.macedonia.services.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -68,8 +70,24 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable Long id, @RequestBody Transaction transactionDetails) {
-        Transaction updatedTransaction = transactionService.updatedTransaction(id, transactionDetails);
+    public ResponseEntity<TransactionDTO> updateTransaction(@PathVariable Long id, @RequestBody TransactionDTO transactionDTO) {
+        TransactionDTO updatedTransaction = transactionService.updatedTransaction(id, transactionDTO);
         return ResponseEntity.ok(updatedTransaction);
+    }
+
+    @GetMapping("/investment")
+    public ResponseEntity<Map<String, String>> getTotalInvestment(@RequestParam int year, @RequestParam int month) {
+        double totalInvestment = transactionService.getTotalInvestmentByMonth(year, month);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "El monto de compras del mes " + month + " del año " + year + " fue de: $" + totalInvestment);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/sales")
+    public ResponseEntity<Map<String, String>> getTotalSales(@RequestParam int year, @RequestParam int month) {
+        double totalSales = transactionService.getTotalSalesByMonth(year, month);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "El monto de ventas del mes " + month + " del año " + year + " fue de: $" + totalSales);
+        return ResponseEntity.ok(response);
     }
 }

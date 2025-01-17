@@ -5,6 +5,8 @@ import com.macedonia.macedonia.persistence.TransactionDAO;
 import com.macedonia.macedonia.repository.TransactionRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class TransactionDAOImpl extends GenericDAOImpl<Transaction, Long, TransactionRepository>  implements TransactionDAO {
 
@@ -24,4 +26,9 @@ public class TransactionDAOImpl extends GenericDAOImpl<Transaction, Long, Transa
     }
 
 
+    @Override
+    public List<Transaction> findByTypeAndDate(String type, int year, int month) {
+        // Usar el repositorio para realizar una consulta personalizada
+        return repository.findByTypeAndDate(type, year, month);
+    }
 }
